@@ -13,6 +13,13 @@ jobs:
       - run:
           name: Check Python files
           command: python -m compileall -q app
+      - run:
+          name: Install test dependencies
+          command: pip install pytest httpx
+
+      - run:
+          name: Run automated tests
+          command: python -m pytest -v
 
 workflows:
   build-and-test:
