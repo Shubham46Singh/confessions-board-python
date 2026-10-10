@@ -2,17 +2,20 @@
 version: 2.1
 
 jobs:
-  build:
+  build-and-test:
     docker:
       - image: cimg/python:3.11
     steps:
       - checkout
+
       - run:
           name: Install dependencies
           command: pip install -r requirements.txt
+
       - run:
           name: Check Python files
           command: python -m compileall -q app
+
       - run:
           name: Install test dependencies
           command: pip install pytest httpx
@@ -21,7 +24,41 @@ jobs:
           name: Run automated tests
           command: python -m pytest -v
 
+  build-and-push:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+
+      - setup_remote_docker
+
+      - run:
+          name: Login to Docker Hub
+          command: |
+            echo "$DOCKERHUB_TOKEN" | docker login \
+              --username "$DOCKERHUB_USERNAME" \
+              --password-stdin
+
+      - run:
+          name: Build Docker image
+          command: |
+            docker build \
+              -t "$DOCKERHUB_USERNAME/confessions-board-python:latest" .
+
+      - run:
+          name: Push Docker image
+          command: |
+            docker push \
+              "$DOCKERHUB_USERNAME/confessions-board-python:latest"
+
 workflows:
-  build-and-test:
+  test-and-publish:
     jobs:
-      - build
+      - build-and-test
+
+      - build-and-push:
+          requires:
+            - build-and-test
+          filters:
+            branches:
+              only: main
