@@ -2,11 +2,11 @@ services:
   db:
     image: postgres:16-alpine
     environment:
-      POSTGRES_USER: assigner
-      POSTGRES_PASSWORD: assigner
-      POSTGRES_DB: assigner
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U assigner -d assigner"]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 3s
       retries: 15
     volumes:
@@ -22,13 +22,13 @@ services:
   migrate:
     image: postgres:16-alpine
     environment:
-      PGPASSWORD: assigner
+      PGPASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - ./migrations:/migrations:ro
     command: >
       sh -c 'for f in /migrations/*.sql; do
                echo "applying $$f";
-               psql -h db -U assigner -d assigner -v ON_ERROR_STOP=1 -f "$$f" || exit 1;
+               psql -h db -U ${POSTGRES_USER} -d ${POSTGRES_DB} -v ON_ERROR_STOP=1 -f "$$f" || exit 1;
              done; echo "migrations done"'
     depends_on:
       db:
@@ -37,10 +37,10 @@ services:
   web:
     build: .
     ports:
-      - "8080:8080"
+      - "${APP_PORT:-8080}:8080"
     environment:
-      DATABASE_URL: postgresql://assigner:assigner@db:5432/assigner
-      REDIS_URL: redis://cache:6379
+      DATABASE_URL: ${DATABASE_URL}
+      REDIS_URL: ${REDIS_URL}
     depends_on:
       db:
         condition: service_healthy
