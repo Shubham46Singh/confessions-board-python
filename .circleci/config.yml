@@ -144,43 +144,7 @@ workflows:
           filters:
             branches:
               only: prod
-workflows:
-  main-qa:
-    jobs:
-      - validate:
-          filters:
-            branches:
-              only: main
 
-      - publish-image:
-          name: publish-qa
-          moving_tag: qa
-          branch_tag: main
-          requires:
-            - validate
-          filters:
-            branches:
-              only: main
-
-  staging:
-    jobs:
-      - publish-image:
-          name: publish-stage
-          moving_tag: stage
-          branch_tag: staging
-          filters:
-            branches:
-              only: staging
-
-  production:
-    jobs:
-      - publish-image:
-          name: publish-prod
-          moving_tag: prod
-          branch_tag: prod
-          filters:
-            branches:
-              only: prod
 
   feature-validation:
     jobs:
