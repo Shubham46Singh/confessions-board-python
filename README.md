@@ -56,6 +56,8 @@ starts. They create the tables and insert sample data. A container running
 
 ---
 
+
+
 ## 2. What you must write
 
 | File | What it has to do |
@@ -110,3 +112,13 @@ Write your answer in your README. It is worth more marks than the feature.
 | `relation "..." does not exist` | Migrations did not run, or the app started before they finished. |
 | Build takes minutes each time | `COPY . .` is above your dependency install. |
 | CI cannot reach the database | In CircleCI service containers the host **is** `localhost` — opposite of compose. |
+
+## CI/CD Pipeline
+
+This project uses CircleCI for Continuous Integration (CI).
+
+- Automatically runs the build pipeline when changes are pushed to GitHub.
+- Installs the required Python dependencies.
+- Checks Python files for syntax errors.
+
+**Status:** CircleCI pipeline testing in progress.
